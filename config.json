@@ -4,12 +4,13 @@
       "sudoList": [
         "237650554606@s.whatsapp.net"
       ],
-      "tagAudioPath": "database/DigiX.mp3",
+      "tagAudioPath": "database/Digix.mp3",
       "antilink": true,
       "response": true,
       "autoreact": false,
       "prefix": ".",
-      "reaction": "zap",
+      "reaction": "⚡",
+      "emoji": "⚡",
       "welcome": true,
       "record": true,
       "type": true,
