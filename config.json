@@ -9,7 +9,7 @@
       "response": true,
       "autoreact": false,
       "prefix": ".",
-      "reaction": "⚡",
+      "reaction": "zap",
       "welcome": true,
       "record": true,
       "type": true,
