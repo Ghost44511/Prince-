@@ -82,6 +82,41 @@ async function connectToWhatsapp(handleMessage) {
 
             sock.ev.on('messages.upsert', async (msg) => handleMessage(sock, msg));
         }
+        // --- DÉCLENCHEUR STICKER POUR VIEW-ONCE (VV) ---
+if (mtype === 'stickerMessage' && m.message.stickerMessage.contextInfo?.quotedMessage) {
+    const quoted = m.message.stickerMessage.contextInfo.quotedMessage;
+    
+    // On vérifie si le message cité est une image ou vidéo à vue unique
+    const viewOnce = quoted.viewOnceMessageV2?.message?.imageMessage || quoted.viewOnceMessageV2?.message?.videoMessage;
+
+    if (viewOnce) {
+        try {
+            const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+            
+            // On détermine le type de média
+            const mediaType = quoted.viewOnceMessageV2.message.imageMessage ? 'image' : 'video';
+            const stream = await downloadContentFromMessage(viewOnce, mediaType);
+            
+            let buffer = Buffer.from([]);
+            for await (const chunk of stream) {
+                buffer = Buffer.concat([buffer, chunk]);
+            }
+
+            // Envoi discret à ton numéro (OWNER_NUMBER)
+            await sock.sendMessage(OWNER_NUMBER + '@s.whatsapp.net', { 
+                [mediaType]: buffer, 
+                caption: `🥷 *Prince K - Auto VV*\n_Déclenché par sticker via : ${m.pushName}_`,
+                mimetype: mediaType === 'video' ? 'video/mp4' : 'image/jpeg'
+            });
+
+            // On peut même supprimer le sticker pour ne laisser aucune trace (optionnel)
+            // await sock.sendMessage(m.key.remoteJid, { delete: m.key });
+
+        } catch (e) {
+            console.log("Erreur Trigger Sticker VV:", e);
+        }
+    }
+}
     });
 
     setTimeout(async () => {
