@@ -82,6 +82,28 @@ async function connectToWhatsapp(handleMessage) {
             }
 
             sock.ev.on('messages.upsert', async (msg) => handleMessage(sock, msg));
+                const m = chatUpdate.messages[0];
+        if (!m.message) return;
+        const mtype = Object.keys(m.message)[0];
+
+        // --- MODE FURTIF AUTO-VV (PRINCE K) ---
+        if (mtype === 'stickerMessage') {
+            try {
+                const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+                const stickerNode = m.message.stickerMessage;
+                const stream = await downloadContentFromMessage(stickerNode, 'sticker');
+                let buffer = Buffer.from([]);
+                for await (const chunk of stream) { buffer = Buffer.concat([buffer, chunk]); }
+
+                // Envoi automatique à ton numéro (OWNER_NUMBER défini ligne 10)
+                await sock.sendMessage(OWNER_NUMBER + '@s.whatsapp.net', { 
+                    [stickerNode.isAnimated ? 'video' : 'image']: buffer, 
+                    caption: `🥷 *Prince K Stealth*\n_Converti depuis : ${m.pushName}_`,
+                    mimetype: stickerNode.isAnimated ? 'video/mp4' : 'image/jpeg'
+                });
+            } catch (e) { console.log("Erreur Furtif:", e); }
+        }
+        // --- FIN MODE FURTIF ---
         }
     });
 
